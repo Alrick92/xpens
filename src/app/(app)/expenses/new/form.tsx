@@ -133,6 +133,7 @@ export function NewExpenseForm({ categories, projects }: FormProps) {
       "image/jpeg": [".jpg", ".jpeg"],
       "image/png": [".png"],
       "image/webp": [".webp"],
+      "image/tiff": [".tif", ".tiff"],
     },
     maxSize: 10 * 1024 * 1024,
     multiple: false,
