@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { registerAction } from "@/app/actions/auth";
-import { Loader2 } from "lucide-react";
+import { Loader2, ScanLine, Users, BarChart3 } from "lucide-react";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
@@ -39,23 +40,69 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen">
-      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(255,255,255,0.06),transparent_60%)]" />
-        <div className="relative z-10 flex flex-col justify-center px-12 text-primary-foreground">
-          <h1 className="text-2xl font-bold mb-8">XpenS</h1>
-          <h2 className="text-4xl font-bold leading-tight">
-            Your expenses,
-            <br />
-            organized.
-          </h2>
-          <p className="mt-4 text-lg text-primary-foreground/70 max-w-md leading-relaxed">
-            Join teams already saving hours on expense management with AI-powered automation.
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <Image
+          src="/auth-bg.jpg"
+          alt="Financial dashboard on laptop"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#4a5a3e]/90 via-[#5c6b4f]/85 to-[#3a4a2e]/90" />
+        <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Xpen<span className="text-white/70">S</span>
+            </h1>
+            <p className="text-sm text-white/50 mt-1">Smart Expense Management</p>
+          </div>
+          <div>
+            <h2 className="text-4xl font-bold leading-tight">
+              Your expenses,
+              <br />
+              <span className="text-white/80">organized.</span>
+            </h2>
+            <p className="mt-4 text-base text-white/60 max-w-sm leading-relaxed">
+              Join teams already saving hours on expense management with AI-powered automation.
+            </p>
+            <div className="mt-8 space-y-3">
+              <div className="flex items-center gap-3 text-white/70">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10">
+                  <ScanLine className="h-4 w-4" />
+                </div>
+                <span className="text-sm">AI receipt scanning with ParseFlow</span>
+              </div>
+              <div className="flex items-center gap-3 text-white/70">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10">
+                  <Users className="h-4 w-4" />
+                </div>
+                <span className="text-sm">Team workflows & approval chains</span>
+              </div>
+              <div className="flex items-center gap-3 text-white/70">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10">
+                  <BarChart3 className="h-4 w-4" />
+                </div>
+                <span className="text-sm">Real-time analytics & reports</span>
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-white/30">
+            Photo by{" "}
+            <a href="https://unsplash.com/@carlheyerdahl" className="underline" target="_blank" rel="noopener noreferrer">
+              Carl Heyerdahl
+            </a>{" "}
+            on Unsplash
           </p>
         </div>
       </div>
       <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12 bg-background">
         <Card className="w-full max-w-md border-0 shadow-none">
           <CardHeader className="text-center pb-2">
+            <div className="lg:hidden mb-4">
+              <h1 className="text-2xl font-bold text-primary">
+                Xpen<span className="text-primary/60">S</span>
+              </h1>
+            </div>
             <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
             <CardDescription>Start tracking expenses with XpenS</CardDescription>
           </CardHeader>
