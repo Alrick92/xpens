@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  EMPLOYEE
+  ACCOUNTANT
+}
+
+enum ExpenseStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  REIMBURSED
+}
+
+enum Currency {
+  USD
+  EUR
+  GBP
+  CAD
+  AUD
+  JPY
+  CHF
+  INR
+  BRL
+  MXN
+  ZAR
+  NZD
+  SGD
+  HKD
+  SEK
+  NOK
+  DKK
+  PLN
+  CZK
+  HUF
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  name           String
+  passwordHash   String    @map("password_hash")
+  role           Role      @default(EMPLOYEE)
+  avatarUrl      String?   @map("avatar_url")
+  defaultCurrency Currency @default(USD) @map("default_currency")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  expenses       Expense[]
+  approvals      Expense[]   @relation("ApprovedBy")
+
+  @@map("users")
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  icon      String?
+  color     String?
+  isDefault Boolean   @default(false) @map("is_default")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  expenses  Expense[]
+
+  @@map("categories")
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  budget      Float?
+  currency    Currency  @default(USD)
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  expenses    Expense[]
+
+  @@map("projects")
+}
+
+model Expense {
+  id              String        @id @default(uuid())
+  description     String
+  amount          Float
+  currency        Currency      @default(USD)
+  date            DateTime
+  merchant        String?
+  receiptUrl      String?       @map("receipt_url")
+  receiptFilename String?       @map("receipt_filename")
+  notes           String?
+  status          ExpenseStatus @default(DRAFT)
+  parseConfidence Float?        @map("parse_confidence")
+  parseRawData    Json?         @map("parse_raw_data")
+
+  userId          String        @map("user_id")
+  user            User          @relation(fields: [userId], references: [id])
+
+  categoryId      String?       @map("category_id")
+  category        Category?     @relation(fields: [categoryId], references: [id])
+
+  projectId       String?       @map("project_id")
+  project         Project?      @relation(fields: [projectId], references: [id])
+
+  approvedById    String?       @map("approved_by_id")
+  approvedBy      User?         @relation("ApprovedBy", fields: [approvedById], references: [id])
+  approvedAt      DateTime?     @map("approved_at")
+
+  lineItems       LineItem[]
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([status])
+  @@index([date])
+  @@map("expenses")
+}
+
+model LineItem {
+  id          String  @id @default(uuid())
+  description String
+  quantity    Float?
+  unitPrice   Float?  @map("unit_price")
+  amount      Float
+
+  expenseId   String  @map("expense_id")
+  expense     Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@map("line_items")
+}

@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# XpenS — Smart Expense Tracking
 
-## Getting Started
+AI-powered expense tracking for freelancers, teams, and businesses. Scan receipts with [ParseFlow](https://parseflow.dev), track expenses, manage approvals, and generate reports.
 
-First, run the development server:
+## Features
+
+- **AI Receipt Scanning** — Upload a receipt (PDF/image), ParseFlow extracts merchant, amount, tax, line items
+- **Expense Management** — Full CRUD with categories, projects, notes, and file attachments
+- **Dashboard** — Summary stats, monthly spending chart, category breakdown (Recharts)
+- **Approval Workflows** — Submit → Manager/Admin approve/reject → Reimburse
+- **Team Roles** — Admin, Manager, Employee, Accountant with role-based access
+- **Multi-Currency** — 20 currencies with proper symbols and formatting
+- **Reports & Export** — Filter by date/status/category/project, export CSV or JSON
+- **Responsive UI** — shadcn/ui components, mobile sidebar, dark mode ready
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 16, React 19, TypeScript |
+| UI | shadcn/ui (Base UI), Tailwind CSS v4 |
+| Charts | Recharts |
+| Database | PostgreSQL 16 + Prisma 7 ORM |
+| Auth | JWT (bcryptjs + jsonwebtoken) |
+| OCR | ParseFlow API |
+| Deployment | Docker Compose |
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 22+
+- Docker & Docker Compose
+- A [ParseFlow API key](https://parseflow.dev) (optional for dev)
+
+### Development
 
 ```bash
+# Clone
+git clone https://github.com/Alrick92/xpens.git
+cd xpens
+
+# Start PostgreSQL
+docker compose up db -d
+
+# Install deps
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your PARSEFLOW_API_KEY
+
+# Run migrations and seed
+npx prisma migrate dev --name init
+npm run db:seed
+
+# Start dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Default admin account:** `admin@xpens.local` / `admin123`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Production (Docker)
 
-## Learn More
+```bash
+# Set your secrets
+export JWT_SECRET=your-production-secret
+export PARSEFLOW_API_KEY=pf_live_your_key
 
-To learn more about Next.js, take a look at the following resources:
+# Build and run
+docker compose up --build -d
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+App runs on [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── (app)/              # Authenticated pages (sidebar layout)
+│   │   ├── dashboard/      # Stats, charts, recent expenses
+│   │   ├── expenses/       # List, create, manage expenses
+│   │   ├── projects/       # Project management
+│   │   ├── approvals/      # Expense approval workflow
+│   │   ├── reports/        # Filter & export reports
+│   │   └── settings/       # Profile, categories, team
+│   ├── login/              # Login page
+│   ├── register/           # Registration page
+│   ├── actions/            # Server Actions (auth, expenses, categories, projects)
+│   └── api/                # Route Handlers (parse-receipt, upload, export)
+├── components/
+│   ├── ui/                 # shadcn/ui components
+│   ├── sidebar.tsx         # Navigation sidebar
+│   └── providers.tsx       # Toast provider
+├── lib/
+│   ├── auth.ts             # JWT session management
+│   ├── db.ts               # Prisma client (PrismaPg adapter)
+│   ├── currencies.ts       # Currency formatting (20 currencies)
+│   └── parseflow.ts        # ParseFlow API client
+prisma/
+├── schema.prisma           # Database schema
+└── seed.ts                 # Default categories + admin user
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Environment Variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `JWT_SECRET` | Secret for signing JWT tokens | Yes (production) |
+| `PARSEFLOW_API_KEY` | ParseFlow API key for receipt OCR | For OCR |
+| `PARSEFLOW_API_URL` | ParseFlow API base URL | No (defaults to https://parseflow.dev/api/v1) |
+| `UPLOAD_DIR` | Directory for file uploads | No (defaults to ./uploads) |
+
+## License
+
+MIT
