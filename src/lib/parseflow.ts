@@ -150,5 +150,10 @@ export async function getExtractionResult(
   }
 
   const raw: ParseFlowApiResponse = await response.json();
+
+  if (raw.status === "failed") {
+    throw new Error("ParseFlow could not extract data from this document");
+  }
+
   return mapApiResponse(raw);
 }
