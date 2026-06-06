@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  Plus,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -63,7 +64,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-secondary text-secondary-foreground font-bold"
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground font-bold"
                   : "text-muted-foreground hover:bg-sidebar-accent transition-colors"
               )}
             >
@@ -75,6 +76,12 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
       </nav>
 
       <div className="border-t border-sidebar-border p-4 space-y-1">
+        <Link href="/expenses/new" onClick={() => setMobileOpen(false)} className="block mb-4">
+          <Button className="w-full gap-2 text-sm">
+            <Plus className="h-4 w-4" />
+            Add Expense
+          </Button>
+        </Link>
         <Link
           href="/settings"
           onClick={() => setMobileOpen(false)}

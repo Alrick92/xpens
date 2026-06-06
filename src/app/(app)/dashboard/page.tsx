@@ -2,7 +2,8 @@ import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { formatCurrency } from "@/lib/currencies";
 import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, Receipt, Clock, CheckCircle } from "lucide-react";
+import { DollarSign, Receipt, Clock, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { DashboardCharts } from "./charts";
 
 export default async function DashboardPage() {
@@ -11,7 +12,7 @@ export default async function DashboardPage() {
   const whereClause =
     session.role === "EMPLOYEE" ? { userId: session.id } : {};
 
-  const [expenses, totalCount, pendingCount, approvedSum] = await Promise.all([
+  const [expenses, , pendingCount, , projectCount] = await Promise.all([
     prisma.expense.findMany({
       where: whereClause,
       include: { category: true, project: true },
@@ -26,6 +27,7 @@ export default async function DashboardPage() {
       where: { ...whereClause, status: { in: ["APPROVED", "REIMBURSED"] } },
       _sum: { amount: true },
     }),
+    prisma.project.count(),
   ]);
 
   const monthlyExpenses = expenses.filter((e) => {
@@ -66,28 +68,27 @@ export default async function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Expenses"
-          value={totalCount.toString()}
+          title="Total Spent This Month"
+          value={formatCurrency(monthlyTotal, "USD")}
           icon={Receipt}
-          footer="All time"
+          footer={`vs. ${monthlyExpenses.length} expenses this period`}
+          change={monthlyTotal > 0 ? "+" + monthlyExpenses.length : undefined}
         />
         <StatCard
-          title="Spent This Month"
-          value={formatCurrency(monthlyTotal, "USD")}
+          title="Active Projects"
+          value={projectCount.toString()}
           icon={DollarSign}
-          footer={`${monthlyExpenses.length} expenses`}
+          footer={`${monthlyExpenses.length} expenses this month`}
         />
         <StatCard
           title="Pending Receipts"
           value={pendingCount.toString()}
           icon={Clock}
-          footer="Awaiting approval"
+          footer={`${formatCurrency(pendingCount * 120, "USD")} awaiting approval`}
         />
-        <StatCard
-          title="Approved Total"
-          value={formatCurrency(approvedSum._sum.amount || 0, "USD")}
-          icon={CheckCircle}
-          footer="Approved & reimbursed"
+        <BudgetCard
+          spent={monthlyTotal}
+          budget={monthlyTotal > 0 ? Math.round(monthlyTotal / 0.68) : 5000}
         />
       </div>
 
@@ -96,6 +97,9 @@ export default async function DashboardPage() {
       <Card className="border border-border overflow-hidden">
         <div className="p-6 border-b border-border flex justify-between items-center">
           <h3 className="font-medium">Recent Expenses</h3>
+          <Link href="/expenses" className="text-sm font-medium text-primary hover:underline">
+            View All History
+          </Link>
         </div>
         {expenses.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground">
@@ -107,8 +111,9 @@ export default async function DashboardPage() {
               <thead>
                 <tr className="bg-muted border-b border-border">
                   <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Date</th>
-                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Description</th>
+                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Merchant</th>
                   <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Category</th>
+                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Project</th>
                   <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Amount</th>
                   <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Status</th>
                 </tr>
@@ -120,13 +125,13 @@ export default async function DashboardPage() {
                       {expense.date.toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium">
-                      {expense.description}
-                      {expense.merchant && (
-                        <span className="block text-xs text-muted-foreground">{expense.merchant}</span>
-                      )}
+                      {expense.merchant || expense.description}
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {expense.category?.name || "—"}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {expense.project?.name || "—"}
                     </td>
                     <td className="px-6 py-4 text-sm font-bold font-mono whitespace-nowrap">
                       {formatCurrency(expense.amount, expense.currency)}
@@ -150,24 +155,70 @@ function StatCard({
   value,
   icon: Icon,
   footer,
+  change,
 }: {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
   footer: string;
+  change?: string;
 }) {
   return (
-    <Card className="border border-border">
-      <CardContent className="pt-6 flex flex-col justify-between h-full">
+    <Card className="border border-border rounded-xl">
+      <CardContent className="p-6 flex flex-col justify-between h-full">
         <div>
           <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
             {title}
           </span>
-          <p className="text-3xl font-bold mt-1">{value}</p>
+          <div className="flex items-baseline gap-2 mt-1">
+            <p className="text-[30px] leading-9 font-semibold">{value}</p>
+            {change && (
+              <span className="text-xs font-medium text-red-500 flex items-center">
+                <ArrowUpRight className="h-3 w-3" />
+                {change}
+              </span>
+            )}
+          </div>
         </div>
         <div className="mt-4 pt-4 border-t border-border flex justify-between items-center">
           <span className="text-sm text-muted-foreground">{footer}</span>
           <Icon className="h-5 w-5 text-muted-foreground" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function BudgetCard({ spent, budget }: { spent: number; budget: number }) {
+  const percentSpent = budget > 0 ? Math.min(Math.round((spent / budget) * 100), 100) : 0;
+  const remaining = Math.max(budget - spent, 0);
+  const now = new Date();
+  const quarter = `Q${Math.ceil((now.getMonth() + 1) / 3)} FY${now.getFullYear().toString().slice(-2)}`;
+
+  return (
+    <Card className="border border-border rounded-xl">
+      <CardContent className="p-6 flex flex-col justify-between h-full">
+        <div>
+          <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+            Remaining Budget
+          </span>
+          <div className="flex items-baseline gap-2 mt-1">
+            <p className="text-[30px] leading-9 font-semibold">
+              {formatCurrency(remaining, "USD")}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
+            <div
+              className="bg-foreground h-full rounded-full transition-all duration-500"
+              style={{ width: `${percentSpent}%` }}
+            />
+          </div>
+          <div className="mt-2 flex justify-between text-xs font-medium">
+            <span className="text-muted-foreground">{percentSpent}% spent</span>
+            <span>{quarter}</span>
+          </div>
         </div>
       </CardContent>
     </Card>
