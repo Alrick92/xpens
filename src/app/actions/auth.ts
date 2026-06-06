@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { signToken } from "@/lib/auth";
+import { signToken, requireSession } from "@/lib/auth";
 import type { Currency, Role } from "@prisma/client";
 
 export async function registerAction(formData: FormData) {
@@ -93,16 +93,16 @@ export async function logoutAction() {
 }
 
 export async function updateProfileAction(formData: FormData) {
-  const userId = formData.get("userId") as string;
+  const session = await requireSession();
   const name = formData.get("name") as string;
   const defaultCurrency = formData.get("defaultCurrency") as Currency;
 
-  if (!userId || !name) {
+  if (!name) {
     return { error: "Name is required" };
   }
 
   await prisma.user.update({
-    where: { id: userId },
+    where: { id: session.id },
     data: { name, defaultCurrency: defaultCurrency || "USD" },
   });
 

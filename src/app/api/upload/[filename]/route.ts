@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import path from "path";
+import { getSession } from "@/lib/auth";
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./uploads";
 
@@ -16,6 +17,11 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ filename: string }> }
 ) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { filename } = await params;
 
   if (filename.includes("..") || filename.includes("/")) {

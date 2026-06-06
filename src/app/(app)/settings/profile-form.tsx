@@ -18,14 +18,12 @@ import { CURRENCY_INFO } from "@/lib/currencies";
 import type { Currency } from "@prisma/client";
 
 interface ProfileFormProps {
-  userId: string;
   name: string;
   email: string;
   defaultCurrency: Currency;
 }
 
 export function ProfileForm({
-  userId,
   name: initialName,
   email,
   defaultCurrency: initialCurrency,
@@ -34,7 +32,6 @@ export function ProfileForm({
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
-    formData.set("userId", userId);
     const result = await updateProfileAction(formData);
     if (result.error) {
       toast.error(result.error);

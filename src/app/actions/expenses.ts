@@ -181,6 +181,12 @@ export async function reimburseExpenseAction(expenseId: string) {
     return { error: "Not authorized" };
   }
 
+  const expense = await prisma.expense.findUnique({ where: { id: expenseId } });
+  if (!expense) return { error: "Expense not found" };
+  if (expense.status !== "APPROVED") {
+    return { error: "Only approved expenses can be reimbursed" };
+  }
+
   await prisma.expense.update({
     where: { id: expenseId },
     data: { status: "REIMBURSED" as ExpenseStatus },

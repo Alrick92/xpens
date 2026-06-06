@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
   if (session.role === "EMPLOYEE") {
     where.userId = session.id;
   }
-  if (status) where.status = status;
-  if (projectId) where.projectId = projectId;
-  if (categoryId) where.categoryId = categoryId;
+  if (status && status !== "all") where.status = status;
+  if (projectId && projectId !== "all") where.projectId = projectId;
+  if (categoryId && categoryId !== "all") where.categoryId = categoryId;
   if (from || to) {
     where.date = {};
     if (from) (where.date as Record<string, Date>).gte = new Date(from);
@@ -40,10 +40,11 @@ export async function GET(request: NextRequest) {
   if (format === "csv") {
     const header =
       "Date,Description,Merchant,Amount,Currency,Category,Project,Status,Submitted By\n";
+    const esc = (s: string) => s.replace(/"/g, '""');
     const rows = expenses
       .map(
         (e) =>
-          `${e.date.toISOString().split("T")[0]},"${e.description}","${e.merchant || ""}",${e.amount},${e.currency},"${e.category?.name || ""}","${e.project?.name || ""}",${e.status},"${e.user.name}"`
+          `${e.date.toISOString().split("T")[0]},"${esc(e.description)}","${esc(e.merchant || "")}",${e.amount},${e.currency},"${esc(e.category?.name || "")}","${esc(e.project?.name || "")}",${e.status},"${esc(e.user.name)}"`
       )
       .join("\n");
 

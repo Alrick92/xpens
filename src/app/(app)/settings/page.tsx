@@ -36,7 +36,6 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardContent>
           <ProfileForm
-            userId={user.id}
             name={user.name}
             email={user.email}
             defaultCurrency={user.defaultCurrency}
