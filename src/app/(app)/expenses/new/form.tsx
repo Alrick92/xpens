@@ -133,6 +133,7 @@ export function NewExpenseForm({ categories, projects }: FormProps) {
       "image/jpeg": [".jpg", ".jpeg"],
       "image/png": [".png"],
       "image/webp": [".webp"],
+      "image/tiff": [".tif", ".tiff"],
     },
     maxSize: 10 * 1024 * 1024,
     multiple: false,
@@ -245,7 +246,7 @@ export function NewExpenseForm({ categories, projects }: FormProps) {
                     Drop a receipt here or click to upload
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    PDF, JPEG, PNG, or WebP (max 10MB)
+                    PDF, JPEG, PNG, WebP, or TIFF (max 10MB)
                   </p>
                 </>
               )}

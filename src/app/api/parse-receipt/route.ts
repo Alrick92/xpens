@@ -21,10 +21,11 @@ export async function POST(request: NextRequest) {
       "image/jpeg",
       "image/png",
       "image/webp",
+      "image/tiff",
     ];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: "Unsupported file type. Use PDF, JPEG, PNG, or WEBP." },
+        { error: "Unsupported file type. Use PDF, JPEG, PNG, WebP, or TIFF." },
         { status: 400 }
       );
     }
