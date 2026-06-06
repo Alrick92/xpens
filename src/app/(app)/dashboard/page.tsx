@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { formatCurrency } from "@/lib/currencies";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { DollarSign, Receipt, Clock, CheckCircle } from "lucide-react";
 import { DashboardCharts } from "./charts";
 
@@ -58,87 +57,89 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+      <section>
+        <h1 className="text-3xl font-bold">Financial Overview</h1>
         <p className="text-muted-foreground">
-          Welcome back, {session.name}
+          Real-time insight into your expenditure, {session.name}.
         </p>
-      </div>
+      </section>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Expenses"
           value={totalCount.toString()}
           icon={Receipt}
-          description="All time"
+          footer="All time"
         />
         <StatCard
-          title="This Month"
+          title="Spent This Month"
           value={formatCurrency(monthlyTotal, "USD")}
           icon={DollarSign}
-          description={`${monthlyExpenses.length} expenses`}
+          footer={`${monthlyExpenses.length} expenses`}
         />
         <StatCard
-          title="Pending Approval"
+          title="Pending Receipts"
           value={pendingCount.toString()}
           icon={Clock}
-          description="Awaiting review"
+          footer="Awaiting approval"
         />
         <StatCard
           title="Approved Total"
           value={formatCurrency(approvedSum._sum.amount || 0, "USD")}
           icon={CheckCircle}
-          description="Approved & reimbursed"
+          footer="Approved & reimbursed"
         />
       </div>
 
       <DashboardCharts categoryData={chartData} monthlyData={monthlyData} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Expenses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {expenses.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              No expenses yet. Start by adding your first expense.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {expenses.slice(0, 5).map((expense) => (
-                <div
-                  key={expense.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium">{expense.description}</p>
-                    <div className="flex gap-2 mt-1">
-                      <span className="text-sm text-muted-foreground">
-                        {expense.date.toLocaleDateString()}
-                      </span>
+      <Card className="border border-border overflow-hidden">
+        <div className="p-6 border-b border-border flex justify-between items-center">
+          <h3 className="font-medium">Recent Expenses</h3>
+        </div>
+        {expenses.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground">
+            No expenses yet. Start by adding your first expense.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-muted border-b border-border">
+                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Date</th>
+                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Description</th>
+                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Category</th>
+                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Amount</th>
+                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {expenses.slice(0, 5).map((expense) => (
+                  <tr key={expense.id} className="hover:bg-muted/50 transition-colors">
+                    <td className="px-6 py-4 text-sm text-muted-foreground whitespace-nowrap">
+                      {expense.date.toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium">
+                      {expense.description}
                       {expense.merchant && (
-                        <span className="text-sm text-muted-foreground">
-                          &middot; {expense.merchant}
-                        </span>
+                        <span className="block text-xs text-muted-foreground">{expense.merchant}</span>
                       )}
-                      {expense.category && (
-                        <Badge variant="secondary" className="text-xs">
-                          {expense.category.name}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {expense.category?.name || "—"}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-bold font-mono whitespace-nowrap">
                       {formatCurrency(expense.amount, expense.currency)}
-                    </p>
-                    <StatusBadge status={expense.status} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={expense.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -148,25 +149,25 @@ function StatCard({
   title,
   value,
   icon: Icon,
-  description,
+  footer,
 }: {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
-  description: string;
+  footer: string;
 }) {
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold">{value}</p>
-            <p className="text-xs text-muted-foreground mt-1">{description}</p>
-          </div>
-          <div className="rounded-lg bg-muted p-3">
-            <Icon className="h-5 w-5 text-muted-foreground" />
-          </div>
+    <Card className="border border-border">
+      <CardContent className="pt-6 flex flex-col justify-between h-full">
+        <div>
+          <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+            {title}
+          </span>
+          <p className="text-3xl font-bold mt-1">{value}</p>
+        </div>
+        <div className="mt-4 pt-4 border-t border-border flex justify-between items-center">
+          <span className="text-sm text-muted-foreground">{footer}</span>
+          <Icon className="h-5 w-5 text-muted-foreground" />
         </div>
       </CardContent>
     </Card>
@@ -174,18 +175,18 @@ function StatCard({
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-    DRAFT: "outline",
-    SUBMITTED: "secondary",
-    APPROVED: "default",
-    REJECTED: "destructive",
-    REIMBURSED: "default",
+  const styles: Record<string, string> = {
+    DRAFT: "bg-muted text-muted-foreground border-border",
+    SUBMITTED: "bg-secondary text-secondary-foreground border-border",
+    APPROVED: "bg-green-50 text-green-700 border-green-200",
+    REJECTED: "bg-red-50 text-red-700 border-red-200",
+    REIMBURSED: "bg-blue-50 text-blue-700 border-blue-200",
   };
 
   return (
-    <Badge variant={variants[status] || "outline"} className="text-xs mt-1">
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border ${styles[status] || styles.DRAFT}`}>
       {status.toLowerCase()}
-    </Badge>
+    </span>
   );
 }
 

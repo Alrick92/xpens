@@ -3,6 +3,7 @@ import { requireSession } from "@/lib/auth";
 import { formatCurrency } from "@/lib/currencies";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { FolderOpen } from "lucide-react";
 import { NewProjectDialog } from "./new-project-dialog";
 
 export default async function ProjectsPage() {
@@ -29,10 +30,13 @@ export default async function ProjectsPage() {
       </div>
 
       {projects.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <p className="text-lg font-medium">No projects yet</p>
-            <p className="text-muted-foreground mt-1">
+        <Card className="border-dashed border-border">
+          <CardContent className="flex flex-col items-center justify-center py-20">
+            <div className="rounded-xl bg-secondary p-3 mb-4">
+              <FolderOpen className="h-6 w-6 text-secondary-foreground" />
+            </div>
+            <p className="text-lg font-semibold">No projects yet</p>
+            <p className="text-muted-foreground mt-1 text-center max-w-sm">
               Create your first project to start organizing expenses
             </p>
           </CardContent>
@@ -49,7 +53,7 @@ export default async function ProjectsPage() {
               : null;
 
             return (
-              <Card key={project.id}>
+              <Card key={project.id} className="border border-border">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-lg">{project.name}</CardTitle>

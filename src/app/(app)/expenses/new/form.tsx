@@ -185,10 +185,10 @@ export function NewExpenseForm({ categories, projects }: FormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <Card>
+      <Card className="border border-border overflow-hidden">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-sm font-medium">
+            <Sparkles className="h-4 w-4" />
             AI Receipt Scanner
           </CardTitle>
         </CardHeader>
@@ -238,7 +238,9 @@ export function NewExpenseForm({ categories, projects }: FormProps) {
                 </>
               ) : (
                 <>
-                  <Upload className="h-10 w-10 text-muted-foreground mb-3" />
+                  <div className="rounded-xl bg-secondary p-3 mb-3">
+                    <Upload className="h-6 w-6 text-secondary-foreground" />
+                  </div>
                   <p className="font-medium">
                     Drop a receipt here or click to upload
                   </p>
@@ -273,9 +275,9 @@ export function NewExpenseForm({ categories, projects }: FormProps) {
 
       <Separator />
 
-      <Card>
+      <Card className="border border-border">
         <CardHeader>
-          <CardTitle>Expense Details</CardTitle>
+          <CardTitle className="text-sm font-medium">Expense Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">

@@ -38,9 +38,9 @@ export default async function ReportsPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         {statusSummary.map((s) => (
-          <Card key={s.status}>
+          <Card key={s.status} className="border border-border">
             <CardContent className="pt-6">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
                 {s.status}
               </p>
               <p className="text-2xl font-bold mt-1">

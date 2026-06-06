@@ -20,14 +20,14 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "hsl(220, 70%, 50%)",
-  "hsl(160, 60%, 45%)",
-  "hsl(30, 80%, 55%)",
-  "hsl(280, 60%, 50%)",
-  "hsl(0, 70%, 55%)",
-  "hsl(200, 70%, 50%)",
-  "hsl(50, 80%, 50%)",
-  "hsl(320, 60%, 50%)",
+  "#1c1b1b",
+  "#5d5e66",
+  "#78767b",
+  "#a8a6aa",
+  "#47464a",
+  "#c8c5ca",
+  "#313030",
+  "#e5e2e1",
 ];
 
 interface ChartProps {
@@ -37,10 +37,10 @@ interface ChartProps {
 
 export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Card>
+    <div className="grid gap-6 lg:grid-cols-3">
+      <Card className="border border-border lg:col-span-2">
         <CardHeader>
-          <CardTitle className="text-base">Monthly Spending</CardTitle>
+          <CardTitle className="text-sm font-medium">Expense Trends</CardTitle>
         </CardHeader>
         <CardContent>
           {monthlyData.length > 0 ? (
@@ -63,7 +63,7 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
                 <Tooltip
                   formatter={(value) => [`$${Number(value).toFixed(2)}`, "Amount"]}
                 />
-                <Bar dataKey="amount" fill="hsl(220, 70%, 50%)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="amount" fill="#1c1b1b" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -74,9 +74,9 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border border-border">
         <CardHeader>
-          <CardTitle className="text-base">By Category</CardTitle>
+          <CardTitle className="text-sm font-medium">Category Breakdown</CardTitle>
         </CardHeader>
         <CardContent>
           {categoryData.length > 0 ? (

@@ -34,7 +34,6 @@ const NAV_ITEMS = [
     roles: ["ADMIN", "MANAGER"] as Role[],
   },
   { href: "/reports", label: "Reports", icon: FileText, roles: null },
-  { href: "/settings", label: "Settings", icon: Settings, roles: null },
 ];
 
 export function Sidebar({ userName, userRole }: SidebarProps) {
@@ -47,11 +46,9 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
 
   const navContent = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 border-b px-6 py-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-          X
-        </div>
-        <span className="text-xl font-bold tracking-tight">XpenS</span>
+      <div className="px-6 py-5 border-b border-sidebar-border">
+        <h1 className="text-xl font-bold text-sidebar-foreground tracking-tight">XpenS</h1>
+        <p className="text-xs text-muted-foreground mt-0.5 capitalize">{userRole.toLowerCase()} Account</p>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-4">
@@ -66,8 +63,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-secondary text-secondary-foreground font-bold"
+                  : "text-muted-foreground hover:bg-sidebar-accent transition-colors"
               )}
             >
               <Icon className="h-4 w-4" />
@@ -77,9 +74,17 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
         })}
       </nav>
 
-      <div className="border-t p-4">
-        <div className="flex items-center gap-3 px-2 py-1">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium">
+      <div className="border-t border-sidebar-border p-4 space-y-1">
+        <Link
+          href="/settings"
+          onClick={() => setMobileOpen(false)}
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-sidebar-accent transition-colors"
+        >
+          <Settings className="h-4 w-4" />
+          Settings
+        </Link>
+        <div className="flex items-center gap-3 px-3 py-3 mt-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted text-sm font-medium">
             {userName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 truncate">
@@ -89,11 +94,11 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
             </p>
           </div>
         </div>
-        <form action="/api/auth/logout" method="POST" className="mt-2">
+        <form action="/api/auth/logout" method="POST">
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start gap-2 text-muted-foreground"
+            className="w-full justify-start gap-2 text-muted-foreground hover:bg-sidebar-accent"
             type="submit"
             formAction={async () => {
               const { logoutAction } = await import("@/app/actions/auth");
@@ -114,7 +119,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed left-4 top-4 z-50 md:hidden"
+        className="fixed left-4 top-4 z-50 md:hidden bg-background shadow-md"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -131,7 +136,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 border-r bg-card transition-transform md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-64 border-r border-sidebar-border bg-sidebar transition-transform md:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

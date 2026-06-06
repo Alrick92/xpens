@@ -4,6 +4,7 @@ import { formatCurrency } from "@/lib/currencies";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { CheckCircle } from "lucide-react";
 import { ApprovalButtons } from "./approval-buttons";
 
 export default async function ApprovalsPage() {
@@ -46,9 +47,13 @@ export default async function ApprovalsPage() {
         </CardHeader>
         <CardContent>
           {pendingExpenses.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              No expenses pending approval
-            </p>
+            <div className="flex flex-col items-center py-12">
+              <div className="rounded-xl bg-secondary p-3 mb-4">
+                <CheckCircle className="h-6 w-6 text-secondary-foreground" />
+              </div>
+              <p className="font-medium text-muted-foreground">All caught up!</p>
+              <p className="text-sm text-muted-foreground mt-1">No expenses pending approval</p>
+            </div>
           ) : (
             <div className="space-y-4">
               {pendingExpenses.map((expense) => (

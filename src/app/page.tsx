@@ -4,56 +4,51 @@ import { Receipt, BarChart3, Users, Zap } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b">
-        <div className="container mx-auto flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-              X
-            </div>
-            <span className="text-xl font-bold tracking-tight">XpenS</span>
-          </div>
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-50 h-16 border-b border-border bg-card flex items-center">
+        <div className="container mx-auto flex items-center justify-between px-8">
+          <h1 className="text-xl font-bold tracking-tight">XpenS</h1>
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button variant="ghost">Sign In</Button>
+              <Button variant="ghost" className="text-sm">Sign In</Button>
             </Link>
             <Link href="/register">
-              <Button>Get Started</Button>
+              <Button className="text-sm">Get Started</Button>
             </Link>
           </div>
         </div>
       </header>
 
       <main className="flex-1">
-        <section className="container mx-auto px-6 py-24 text-center">
-          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
-            Simplify your expenses
-            <br />
-            <span className="text-muted-foreground">with XpenS</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            AI-powered expense tracking for freelancers, teams, and businesses.
-            Scan receipts, track expenses, manage approvals, and generate
-            reports — all in one place.
-          </p>
-          <div className="mt-10 flex justify-center gap-4">
-            <Link href="/register">
-              <Button size="lg" className="gap-2">
-                <Zap className="h-4 w-4" />
-                Start Tracking Free
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button size="lg" variant="outline">
-                Sign In
-              </Button>
-            </Link>
+        <section className="container mx-auto px-8 py-24 lg:py-32">
+          <div className="max-w-3xl">
+            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-tight">
+              Simplify your
+              <br />
+              expense workflow
+            </h2>
+            <p className="mt-6 text-lg text-muted-foreground max-w-xl leading-relaxed">
+              AI-powered expense tracking for teams and businesses. Scan receipts,
+              manage approvals, and generate reports — all in one place.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link href="/register">
+                <Button size="lg" className="text-sm">
+                  Start Tracking Free
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button size="lg" variant="outline" className="text-sm">
+                  Sign In
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
 
-        <section className="border-t bg-muted/50 py-20">
-          <div className="container mx-auto px-6">
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <section className="border-t border-border py-20 lg:py-24">
+          <div className="container mx-auto px-8">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <FeatureCard
                 icon={Receipt}
                 title="AI Receipt Scanning"
@@ -79,7 +74,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
         <p>&copy; {new Date().getFullYear()} XpenS. All rights reserved.</p>
       </footer>
     </div>
@@ -96,12 +91,14 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border bg-card p-6">
-      <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3">
-        <Icon className="h-6 w-6 text-primary" />
+    <div className="rounded-xl border border-border bg-card p-6 flex flex-col justify-between">
+      <div>
+        <div className="mb-4 inline-flex rounded-lg bg-secondary p-2.5">
+          <Icon className="h-5 w-5 text-secondary-foreground" />
+        </div>
+        <h3 className="mb-2 font-semibold">{title}</h3>
+        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
       </div>
-      <h3 className="mb-2 font-semibold">{title}</h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }
