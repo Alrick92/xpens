@@ -34,7 +34,7 @@ export default function LoginPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#4a5a3e]/90 via-[#5c6b4f]/85 to-[#3a4a2e]/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#4a5a3e]/70 via-[#5c6b4f]/60 to-[#3a4a2e]/75" />
         <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
