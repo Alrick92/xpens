@@ -133,7 +133,7 @@ export default async function ProjectsPage({
           </div>
           {totalPages > 1 && (
             <Card className="border border-border overflow-hidden">
-              <Pagination currentPage={currentPage} totalPages={totalPages} />
+              <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/projects" />
             </Card>
           )}
         </>

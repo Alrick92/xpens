@@ -122,7 +122,7 @@ export default async function ExpensesPage({
               </tbody>
             </table>
           </div>
-          <Pagination currentPage={currentPage} totalPages={totalPages} />
+          <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/expenses" />
         </Card>
       )}
     </div>

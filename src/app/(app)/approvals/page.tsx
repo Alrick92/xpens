@@ -125,7 +125,7 @@ export default async function ApprovalsPage({
           )}
         </CardContent>
         {pendingTotalPages > 1 && (
-          <Pagination currentPage={pendingPage} totalPages={pendingTotalPages} />
+          <Pagination currentPage={pendingPage} totalPages={pendingTotalPages} basePath="/approvals" />
         )}
       </Card>
 
@@ -168,7 +168,7 @@ export default async function ApprovalsPage({
             </div>
           </CardContent>
           {decisionsTotalPages > 1 && (
-            <Pagination currentPage={decisionsPage} totalPages={decisionsTotalPages} />
+            <Pagination currentPage={decisionsPage} totalPages={decisionsTotalPages} basePath="/approvals" pageParam="dpage" />
           )}
         </Card>
       )}
