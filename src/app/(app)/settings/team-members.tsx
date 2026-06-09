@@ -22,7 +22,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { KeyRound, Loader2, ShieldCheck } from "lucide-react";
+import { KeyRound, Loader2, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   toggleUserActiveAction,
   resetUserPasswordAction,
@@ -58,12 +58,21 @@ const ROLES: { value: Role; label: string }[] = [
   { value: "ACCOUNTANT", label: "Accountant" },
 ];
 
+const PAGE_SIZE = 10;
+
 export function TeamMembers({ users, currentUserId }: TeamMembersProps) {
   const [resetDialogUser, setResetDialogUser] = useState<TeamMember | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [resetting, setResetting] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [changingRoleId, setChangingRoleId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(users.length / PAGE_SIZE);
+  const paginatedUsers = users.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   async function handleToggleActive(user: TeamMember) {
     setTogglingId(user.id);
@@ -108,7 +117,7 @@ export function TeamMembers({ users, currentUserId }: TeamMembersProps) {
   return (
     <>
       <div className="space-y-3">
-        {users.map((user) => {
+        {paginatedUsers.map((user) => {
           const isSelf = user.id === currentUserId;
           return (
             <div
@@ -195,6 +204,36 @@ export function TeamMembers({ users, currentUserId }: TeamMembersProps) {
           );
         })}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between border-t border-border pt-3 mt-3">
+          <p className="text-xs text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1 text-xs"
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1 text-xs"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Next
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Dialog
         open={resetDialogUser !== null}

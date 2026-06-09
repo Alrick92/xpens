@@ -6,29 +6,55 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle } from "lucide-react";
 import { ApprovalButtons } from "./approval-buttons";
+import { Pagination } from "@/components/pagination";
 
-export default async function ApprovalsPage() {
+const PAGE_SIZE = 10;
+
+export default async function ApprovalsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; dpage?: string }>;
+}) {
   const session = await requireSession();
 
   if (session.role !== "ADMIN" && session.role !== "MANAGER") {
     redirect("/dashboard");
   }
 
-  const pendingExpenses = await prisma.expense.findMany({
-    where: { status: "SUBMITTED" },
-    include: { user: true, category: true, project: true },
-    orderBy: { createdAt: "asc" },
-  });
+  const params = await searchParams;
+  const pendingPage = Math.max(1, parseInt(params.page || "1", 10));
+  const decisionsPage = Math.max(1, parseInt(params.dpage || "1", 10));
 
-  const recentDecisions = await prisma.expense.findMany({
-    where: {
-      approvedById: session.id,
-      status: { in: ["APPROVED", "REJECTED", "REIMBURSED"] },
-    },
-    include: { user: true, category: true },
-    orderBy: { approvedAt: "desc" },
-    take: 10,
-  });
+  const [pendingExpenses, pendingCount, recentDecisions, decisionsCount] =
+    await Promise.all([
+      prisma.expense.findMany({
+        where: { status: "SUBMITTED" },
+        include: { user: true, category: true, project: true },
+        orderBy: { createdAt: "asc" },
+        skip: (pendingPage - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+      }),
+      prisma.expense.count({ where: { status: "SUBMITTED" } }),
+      prisma.expense.findMany({
+        where: {
+          approvedById: session.id,
+          status: { in: ["APPROVED", "REJECTED", "REIMBURSED"] },
+        },
+        include: { user: true, category: true },
+        orderBy: { approvedAt: "desc" },
+        skip: (decisionsPage - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+      }),
+      prisma.expense.count({
+        where: {
+          approvedById: session.id,
+          status: { in: ["APPROVED", "REJECTED", "REIMBURSED"] },
+        },
+      }),
+    ]);
+
+  const pendingTotalPages = Math.ceil(pendingCount / PAGE_SIZE);
+  const decisionsTotalPages = Math.ceil(decisionsCount / PAGE_SIZE);
 
   return (
     <div className="space-y-6">
@@ -42,11 +68,11 @@ export default async function ApprovalsPage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            Pending Approval ({pendingExpenses.length})
+            Pending Approval ({pendingCount})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {pendingExpenses.length === 0 ? (
+          {pendingCount === 0 ? (
             <div className="flex flex-col items-center py-12">
               <div className="rounded-xl bg-muted p-3 mb-3">
                 <CheckCircle className="h-6 w-6 text-muted-foreground" />
@@ -98,9 +124,12 @@ export default async function ApprovalsPage() {
             </div>
           )}
         </CardContent>
+        {pendingTotalPages > 1 && (
+          <Pagination currentPage={pendingPage} totalPages={pendingTotalPages} />
+        )}
       </Card>
 
-      {recentDecisions.length > 0 && (
+      {decisionsCount > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Recent Decisions</CardTitle>
@@ -138,6 +167,9 @@ export default async function ApprovalsPage() {
               ))}
             </div>
           </CardContent>
+          {decisionsTotalPages > 1 && (
+            <Pagination currentPage={decisionsPage} totalPages={decisionsTotalPages} />
+          )}
         </Card>
       )}
     </div>
