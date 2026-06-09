@@ -2,7 +2,8 @@ import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { formatCurrency } from "@/lib/currencies";
 import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, Receipt, Clock, ArrowUpRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FolderOpen, Receipt, Clock, ArrowUpRight, ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { DashboardCharts } from "./charts";
 
@@ -58,17 +59,17 @@ export default async function DashboardPage() {
   const monthlyData = await getMonthlyData(whereClause);
 
   return (
-    <div className="space-y-6">
-      <section>
-        <h1 className="text-3xl font-bold">Financial Overview</h1>
-        <p className="text-muted-foreground">
+    <div className="space-y-4">
+      <section aria-label="Page header">
+        <h1 className="text-2xl font-semibold">Financial Overview</h1>
+        <p className="text-xs text-muted-foreground">
           Real-time insight into your expenditure, {session.name}.
         </p>
       </section>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" role="group" aria-label="Spending summary">
         <StatCard
-          title="Total Spent This Month"
+          title="Spent This Month"
           value={formatCurrency(monthlyTotal, "USD")}
           icon={Receipt}
           footer={`vs. ${monthlyExpenses.length} expenses this period`}
@@ -77,14 +78,14 @@ export default async function DashboardPage() {
         <StatCard
           title="Active Projects"
           value={projectCount.toString()}
-          icon={DollarSign}
+          icon={FolderOpen}
           footer={`${monthlyExpenses.length} expenses this month`}
         />
         <StatCard
-          title="Pending Receipts"
+          title="Awaiting Review"
           value={pendingCount.toString()}
           icon={Clock}
-          footer={`${formatCurrency(pendingCount * 120, "USD")} awaiting approval`}
+          footer={`${formatCurrency(pendingCount * 120, "USD")} pending approval`}
         />
         <BudgetCard
           spent={monthlyTotal}
@@ -95,48 +96,57 @@ export default async function DashboardPage() {
       <DashboardCharts categoryData={chartData} monthlyData={monthlyData} />
 
       <Card className="border border-border overflow-hidden">
-        <div className="p-6 border-b border-border flex justify-between items-center">
-          <h3 className="font-medium">Recent Expenses</h3>
-          <Link href="/expenses" className="text-sm font-medium text-primary hover:underline">
-            View All History
+        <div className="px-4 py-3 border-b border-border flex justify-between items-center">
+          <h3 className="text-sm font-semibold">Recent Expenses</h3>
+          <Link href="/expenses" className="text-xs font-medium text-primary hover:underline focus-ring rounded">
+            View all expenses
           </Link>
         </div>
         {expenses.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            No expenses yet. Start by adding your first expense.
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <div className="rounded-xl bg-muted p-3 mb-3">
+              <ReceiptText className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-semibold">No expenses yet</p>
+            <p className="text-xs text-muted-foreground mt-1 text-center max-w-xs">
+              Add your first expense or scan a receipt to get started.
+            </p>
+            <Link href="/expenses/new" className="mt-4">
+              <Button size="sm">Add your first expense</Button>
+            </Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-muted border-b border-border">
-                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Date</th>
-                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Merchant</th>
-                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Category</th>
-                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Project</th>
-                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Amount</th>
-                  <th className="px-6 py-3 text-xs text-muted-foreground uppercase tracking-wider font-medium">Status</th>
+                <tr className="border-b border-border">
+                  <th scope="col" className="px-4 py-2.5 text-[10px] text-muted-foreground uppercase tracking-[0.04em] font-medium">Date</th>
+                  <th scope="col" className="px-4 py-2.5 text-[10px] text-muted-foreground uppercase tracking-[0.04em] font-medium">Merchant</th>
+                  <th scope="col" className="px-4 py-2.5 text-[10px] text-muted-foreground uppercase tracking-[0.04em] font-medium">Category</th>
+                  <th scope="col" className="px-4 py-2.5 text-[10px] text-muted-foreground uppercase tracking-[0.04em] font-medium">Project</th>
+                  <th scope="col" className="px-4 py-2.5 text-[10px] text-muted-foreground uppercase tracking-[0.04em] font-medium text-right">Amount</th>
+                  <th scope="col" className="px-4 py-2.5 text-[10px] text-muted-foreground uppercase tracking-[0.04em] font-medium">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {expenses.slice(0, 5).map((expense) => (
-                  <tr key={expense.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-muted-foreground whitespace-nowrap">
+                  <tr key={expense.id} className="hover:bg-muted/50 transition-colors duration-150 cursor-pointer">
+                    <td className="px-4 py-3 text-sm text-muted-foreground whitespace-nowrap">
                       {expense.date.toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-sm font-medium">
+                    <td className="px-4 py-3 text-sm font-medium">
                       {expense.merchant || expense.description}
                     </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
                       {expense.category?.name || "—"}
                     </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
                       {expense.project?.name || "—"}
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold font-mono whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm font-semibold font-mono font-tabular whitespace-nowrap text-right">
                       {formatCurrency(expense.amount, expense.currency)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <StatusBadge status={expense.status} />
                     </td>
                   </tr>
@@ -165,24 +175,24 @@ function StatCard({
 }) {
   return (
     <Card className="border border-border rounded-xl">
-      <CardContent className="p-6 flex flex-col justify-between h-full">
+      <CardContent className="p-4 flex flex-col justify-between h-full">
         <div>
-          <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+          <span className="text-[10px] text-muted-foreground uppercase tracking-[0.05em] font-medium">
             {title}
           </span>
           <div className="flex items-baseline gap-2 mt-1">
-            <p className="text-[30px] leading-9 font-semibold">{value}</p>
+            <p className="text-[32px] leading-[38px] font-semibold font-tabular">{value}</p>
             {change && (
-              <span className="text-xs font-medium text-red-500 flex items-center">
+              <span className="text-[11px] font-medium text-[#C4533A] flex items-center">
                 <ArrowUpRight className="h-3 w-3" />
                 {change}
               </span>
             )}
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t border-border flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">{footer}</span>
-          <Icon className="h-5 w-5 text-muted-foreground" />
+        <div className="mt-3 pt-3 border-t border-border flex justify-between items-center">
+          <span className="text-[11px] text-muted-foreground">{footer}</span>
+          <Icon className="h-4 w-4 text-muted-foreground" />
         </div>
       </CardContent>
     </Card>
@@ -197,25 +207,25 @@ function BudgetCard({ spent, budget }: { spent: number; budget: number }) {
 
   return (
     <Card className="border border-border rounded-xl">
-      <CardContent className="p-6 flex flex-col justify-between h-full">
+      <CardContent className="p-4 flex flex-col justify-between h-full">
         <div>
-          <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
-            Remaining Budget
+          <span className="text-[10px] text-muted-foreground uppercase tracking-[0.05em] font-medium">
+            Budget Remaining
           </span>
           <div className="flex items-baseline gap-2 mt-1">
-            <p className="text-[30px] leading-9 font-semibold">
+            <p className="text-[32px] leading-[38px] font-semibold font-tabular">
               {formatCurrency(remaining, "USD")}
             </p>
           </div>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
             <div
-              className="bg-foreground h-full rounded-full transition-all duration-500"
+              className="bg-primary h-full rounded-full transition-all duration-500"
               style={{ width: `${percentSpent}%` }}
             />
           </div>
-          <div className="mt-2 flex justify-between text-xs font-medium">
+          <div className="mt-1.5 flex justify-between text-[10px] font-medium">
             <span className="text-muted-foreground">{percentSpent}% spent</span>
             <span>{quarter}</span>
           </div>
@@ -227,15 +237,15 @@ function BudgetCard({ spent, budget }: { spent: number; budget: number }) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    DRAFT: "bg-muted text-muted-foreground border-border",
-    SUBMITTED: "bg-secondary text-secondary-foreground border-border",
-    APPROVED: "bg-green-50 text-green-700 border-green-200",
-    REJECTED: "bg-red-50 text-red-700 border-red-200",
-    REIMBURSED: "bg-blue-50 text-blue-700 border-blue-200",
+    DRAFT: "bg-muted/60 text-muted-foreground",
+    SUBMITTED: "bg-[#FBE379]/15 text-[#8B7A20]",
+    APPROVED: "bg-[#6B7C5E]/15 text-[#6B7C5E]",
+    REJECTED: "bg-[#C4533A]/15 text-[#C4533A]",
+    REIMBURSED: "bg-muted text-muted-foreground",
   };
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border ${styles[status] || styles.DRAFT}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[0.03em] ${styles[status] || styles.DRAFT}`}>
       {status.toLowerCase()}
     </span>
   );

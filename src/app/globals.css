@@ -67,11 +67,12 @@
   --border: #D4CFC7;
   --input: #D4CFC7;
   --ring: #6B7C5E;
-  --chart-1: #5C6B4F;
+  --chart-1: #6B7C5E;
   --chart-2: #8B7355;
-  --chart-3: #A3B18A;
-  --chart-4: #C4B7A0;
-  --chart-5: #7C7868;
+  --chart-3: #A8B89A;
+  --chart-4: #C4876B;
+  --chart-5: #D4B96A;
+  --chart-6: #9E9A90;
   --radius: 0.625rem;
   --sidebar: #F5F0EB;
   --sidebar-foreground: #2D2A22;
@@ -126,5 +127,14 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 }
