@@ -51,20 +51,18 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
           <h3 className="text-sm font-semibold">
             Expense Trends <span className="text-muted-foreground font-normal text-xs">(Last 30 Days)</span>
           </h3>
-          <div className="flex" role="tablist" aria-label="Time range">
+          <div className="flex">
             {(["Day", "Week", "Month"] as const).map((label) => (
-              <button
+              <span
                 key={label}
-                role="tab"
-                aria-selected={timeRange === label}
-                className={`px-3 py-1 text-[11px] font-medium transition-colors duration-150 first:rounded-l last:rounded-r focus-ring ${
+                className={`px-3 py-1 text-[11px] font-medium first:rounded-l last:rounded-r select-none ${
                   timeRange === label
                     ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
                 {label}
-              </button>
+              </span>
             ))}
           </div>
         </div>
@@ -190,6 +188,11 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
                     </div>
                   );
                 })}
+                {categoryData.length > 5 && (
+                  <p className="text-[10px] text-muted-foreground pt-1">
+                    +{categoryData.length - 5} more categor{categoryData.length - 5 === 1 ? "y" : "ies"}
+                  </p>
+                )}
               </div>
             </div>
           ) : (
