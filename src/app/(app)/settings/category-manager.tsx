@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   createCategoryAction,
   deleteCategoryAction,
@@ -17,10 +17,19 @@ interface CategoryManagerProps {
   isAdmin: boolean;
 }
 
+const PAGE_SIZE = 10;
+
 export function CategoryManager({ categories, isAdmin }: CategoryManagerProps) {
   const router = useRouter();
   const [newName, setNewName] = useState("");
   const [adding, setAdding] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(categories.length / PAGE_SIZE);
+  const paginatedCategories = categories.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   async function handleAdd() {
     if (!newName.trim()) return;
@@ -67,7 +76,7 @@ export function CategoryManager({ categories, isAdmin }: CategoryManagerProps) {
         </Button>
       </div>
       <div className="space-y-2">
-        {categories.map((cat) => (
+        {paginatedCategories.map((cat) => (
           <div
             key={cat.id}
             className="flex items-center justify-between rounded-lg border px-4 py-2"
@@ -98,6 +107,36 @@ export function CategoryManager({ categories, isAdmin }: CategoryManagerProps) {
           </p>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between border-t border-border pt-3">
+          <p className="text-xs text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1 text-xs"
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1 text-xs"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Next
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

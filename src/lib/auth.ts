@@ -31,6 +31,14 @@ export async function getSession(): Promise<SessionUser | null> {
   return verifyToken(token);
 }
 
+export async function getActiveSession(): Promise<SessionUser | null> {
+  const session = await getSession();
+  if (!session) return null;
+  const user = await prisma.user.findUnique({ where: { id: session.id } });
+  if (!user || !user.isActive) return null;
+  return { id: user.id, email: user.email, name: user.name, role: user.role };
+}
+
 export async function requireSession(): Promise<SessionUser> {
   const session = await getSession();
   if (!session) {
@@ -39,6 +47,9 @@ export async function requireSession(): Promise<SessionUser> {
   const user = await prisma.user.findUnique({ where: { id: session.id } });
   if (!user) {
     throw new Error("User not found");
+  }
+  if (!user.isActive) {
+    throw new Error("Account disabled");
   }
   return {
     id: user.id,

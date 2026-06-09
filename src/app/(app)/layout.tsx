@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getActiveSession } from "@/lib/auth";
 import { Sidebar } from "@/components/sidebar";
 import { TopBar } from "@/components/top-bar";
 
@@ -8,7 +8,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
+  const session = await getActiveSession();
   if (!session) redirect("/login");
 
   return (

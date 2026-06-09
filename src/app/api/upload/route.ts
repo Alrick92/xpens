@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getActiveSession } from "@/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./uploads";
 
 export async function POST(request: NextRequest) {
-  const session = await getSession();
+  const session = await getActiveSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

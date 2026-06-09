@@ -6,25 +6,34 @@ import { Button } from "@/components/ui/button";
 import { Plus, Receipt as ReceiptIcon } from "lucide-react";
 import Link from "next/link";
 import { ExpenseActions } from "./expense-actions";
+import { Pagination } from "@/components/pagination";
 
-export default async function ExpensesPage() {
+const PAGE_SIZE = 10;
+
+export default async function ExpensesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await requireSession();
+  const params = await searchParams;
+  const currentPage = Math.max(1, parseInt(params.page || "1", 10));
 
   const whereClause =
     session.role === "EMPLOYEE" ? { userId: session.id } : {};
 
-  const [expenses] = await Promise.all([
+  const [expenses, totalCount] = await Promise.all([
     prisma.expense.findMany({
       where: whereClause,
       include: { category: true, project: true, user: true, lineItems: true },
       orderBy: { date: "desc" },
+      skip: (currentPage - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
     }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
-    prisma.project.findMany({
-      where: { isActive: true },
-      orderBy: { name: "asc" },
-    }),
+    prisma.expense.count({ where: whereClause }),
   ]);
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
     <div className="space-y-6">
@@ -32,7 +41,7 @@ export default async function ExpensesPage() {
         <div>
           <h1 className="text-2xl font-semibold">Expenses</h1>
           <p className="text-xs text-muted-foreground">
-            {expenses.length} expense{expenses.length !== 1 ? "s" : ""} total
+            {totalCount} expense{totalCount !== 1 ? "s" : ""} total
           </p>
         </div>
         <Link href="/expenses/new">
@@ -43,7 +52,7 @@ export default async function ExpensesPage() {
         </Link>
       </div>
 
-      {expenses.length === 0 ? (
+      {totalCount === 0 ? (
         <Card className="border-dashed border-border">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="rounded-xl bg-muted p-3 mb-3">
@@ -113,6 +122,7 @@ export default async function ExpensesPage() {
               </tbody>
             </table>
           </div>
+          <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/expenses" />
         </Card>
       )}
     </div>

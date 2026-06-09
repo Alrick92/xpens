@@ -1,5 +1,6 @@
-const PARSEFLOW_API_URL =
-  process.env.PARSEFLOW_API_URL || "https://parseflow.dev/api/v1";
+import { prisma } from "@/lib/db";
+
+const PARSEFLOW_API_URL_DEFAULT = "https://parseflow.dev/api/v1";
 
 export interface ParseFlowResult {
   id: string;
@@ -28,16 +29,35 @@ export interface ParseFlowResult {
   model_used: string;
 }
 
+async function getApiKey(): Promise<string> {
+  const dbSetting = await prisma.appSetting.findUnique({
+    where: { key: "parseflow_api_key" },
+  });
+  if (dbSetting?.value) return dbSetting.value;
+
+  const envKey = process.env.PARSEFLOW_API_KEY;
+  if (envKey) return envKey;
+
+  throw new Error("PARSEFLOW_API_KEY is not configured");
+}
+
+async function getApiUrl(): Promise<string> {
+  const dbSetting = await prisma.appSetting.findUnique({
+    where: { key: "parseflow_api_url" },
+  });
+  if (dbSetting?.value) return dbSetting.value;
+
+  return process.env.PARSEFLOW_API_URL || PARSEFLOW_API_URL_DEFAULT;
+}
+
 export async function parseDocument(file: File): Promise<ParseFlowResult> {
-  const apiKey = process.env.PARSEFLOW_API_KEY;
-  if (!apiKey) {
-    throw new Error("PARSEFLOW_API_KEY is not configured");
-  }
+  const apiKey = await getApiKey();
+  const apiUrl = await getApiUrl();
 
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch(`${PARSEFLOW_API_URL}/extract`, {
+  const response = await fetch(`${apiUrl}/extract`, {
     method: "POST",
     headers: {
       "X-API-Key": apiKey,
@@ -61,12 +81,10 @@ export async function checkUsage(): Promise<{
   parses_remaining: number;
   plan: string;
 }> {
-  const apiKey = process.env.PARSEFLOW_API_KEY;
-  if (!apiKey) {
-    throw new Error("PARSEFLOW_API_KEY is not configured");
-  }
+  const apiKey = await getApiKey();
+  const apiUrl = await getApiUrl();
 
-  const response = await fetch(`${PARSEFLOW_API_URL}/usage`, {
+  const response = await fetch(`${apiUrl}/usage`, {
     headers: { "X-API-Key": apiKey },
   });
 
@@ -75,4 +93,23 @@ export async function checkUsage(): Promise<{
   }
 
   return response.json();
+}
+
+export async function getParseFlowConfig(): Promise<{
+  apiKey: string;
+  apiUrl: string;
+  source: "database" | "environment";
+}> {
+  const dbKey = await prisma.appSetting.findUnique({
+    where: { key: "parseflow_api_key" },
+  });
+  const dbUrl = await prisma.appSetting.findUnique({
+    where: { key: "parseflow_api_url" },
+  });
+
+  return {
+    apiKey: dbKey?.value || process.env.PARSEFLOW_API_KEY || "",
+    apiUrl: dbUrl?.value || process.env.PARSEFLOW_API_URL || PARSEFLOW_API_URL_DEFAULT,
+    source: dbKey?.value ? "database" : "environment",
+  };
 }
