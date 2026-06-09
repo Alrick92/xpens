@@ -21,8 +21,8 @@ export default async function ProjectsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Projects</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold">Projects</h1>
+          <p className="text-xs text-muted-foreground">
             Organize expenses by project or client
           </p>
         </div>
@@ -31,13 +31,13 @@ export default async function ProjectsPage() {
 
       {projects.length === 0 ? (
         <Card className="border-dashed border-border">
-          <CardContent className="flex flex-col items-center justify-center py-20">
-            <div className="rounded-xl bg-secondary p-3 mb-4">
-              <FolderOpen className="h-6 w-6 text-secondary-foreground" />
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <div className="rounded-xl bg-muted p-3 mb-3">
+              <FolderOpen className="h-6 w-6 text-muted-foreground" />
             </div>
-            <p className="text-lg font-semibold">No projects yet</p>
-            <p className="text-muted-foreground mt-1 text-center max-w-sm">
-              Create your first project to start organizing expenses
+            <p className="text-sm font-semibold">No projects yet</p>
+            <p className="text-xs text-muted-foreground mt-1 text-center max-w-xs">
+              Create your first project to start organizing expenses.
             </p>
           </CardContent>
         </Card>

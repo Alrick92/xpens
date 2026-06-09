@@ -19,14 +19,12 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "#5C6B4F",
+  "#6B7C5E",
   "#8B7355",
-  "#A3B18A",
-  "#C4B7A0",
-  "#7C7868",
-  "#3A4A2E",
-  "#B09070",
-  "#D4CFC7",
+  "#A8B89A",
+  "#C4876B",
+  "#D4B96A",
+  "#9E9A90",
 ];
 
 interface ChartProps {
@@ -47,20 +45,22 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
     : `$${totalAmount.toFixed(0)}`;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid gap-4 lg:grid-cols-3">
       <Card className="border border-border rounded-xl lg:col-span-2">
-        <div className="p-6 flex justify-between items-center">
-          <h3 className="text-sm font-medium">
-            Expense Trends <span className="text-muted-foreground font-normal">(Last 30 Days)</span>
+        <div className="px-4 py-3 flex justify-between items-center">
+          <h3 className="text-sm font-semibold">
+            Expense Trends <span className="text-muted-foreground font-normal text-xs">(Last 30 Days)</span>
           </h3>
-          <div className="flex gap-1">
+          <div className="flex" role="tablist" aria-label="Time range">
             {(["Day", "Week", "Month"] as const).map((label) => (
               <button
                 key={label}
-                className={`px-3 py-1 rounded text-xs font-medium border transition-colors ${
+                role="tab"
+                aria-selected={timeRange === label}
+                className={`px-3 py-1 text-[11px] font-medium transition-colors duration-150 first:rounded-l last:rounded-r focus-ring ${
                   timeRange === label
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-muted border-border text-muted-foreground"
+                    ? "bg-foreground text-background"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
               >
                 {label}
@@ -68,7 +68,7 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
             ))}
           </div>
         </div>
-        <CardContent className="pb-6">
+        <CardContent className="pb-4 px-4">
           {monthlyData.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
               <AreaChart data={monthlyData}>
@@ -113,18 +113,25 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-center text-muted-foreground py-8">
-              No spending data yet
-            </p>
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-full h-[120px] flex items-end justify-center gap-2 mb-3 opacity-20">
+                {[40, 65, 50, 80, 60, 45, 70].map((h, i) => (
+                  <div key={i} className="w-8 bg-muted-foreground/30 rounded-t" style={{ height: `${h}%` }} />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Expense trends will appear here after your first submission.
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>
 
       <Card className="border border-border rounded-xl">
-        <div className="p-6">
-          <h3 className="text-sm font-medium">Category Breakdown</h3>
+        <div className="px-4 py-3">
+          <h3 className="text-sm font-semibold">Category Breakdown</h3>
         </div>
-        <CardContent className="pb-6">
+        <CardContent className="pb-4 px-4">
           {categoryData.length > 0 ? (
             <div className="flex flex-col items-center">
               <div className="relative">
@@ -160,13 +167,13 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <span className="text-xl font-semibold block">{totalFormatted}</span>
-                    <span className="text-xs text-muted-foreground">Total</span>
+                    <span className="text-base font-semibold block">{totalFormatted}</span>
+                    <span className="text-[10px] text-muted-foreground">Total</span>
                   </div>
                 </div>
               </div>
-              <div className="mt-6 w-full space-y-3">
-                {categoryData.map((cat, index) => {
+              <div className="mt-4 w-full space-y-2">
+                {categoryData.slice(0, 5).map((cat, index) => {
                   const percent = totalAmount > 0
                     ? Math.round((cat.amount / totalAmount) * 100)
                     : 0;
@@ -177,18 +184,23 @@ export function DashboardCharts({ categoryData, monthlyData }: ChartProps) {
                           className="w-2 h-2 rounded-full"
                           style={{ backgroundColor: COLORS[index % COLORS.length] }}
                         />
-                        <span className="text-sm">{cat.name}</span>
+                        <span className="text-xs">{cat.name}</span>
                       </div>
-                      <span className="text-xs font-medium">{percent}%</span>
+                      <span className="text-[11px] font-medium text-muted-foreground">{percent}%</span>
                     </div>
                   );
                 })}
               </div>
             </div>
           ) : (
-            <p className="text-center text-muted-foreground py-8">
-              No category data yet
-            </p>
+            <div className="flex flex-col items-center justify-center py-10">
+              <div className="relative w-[120px] h-[120px] mb-3 opacity-20">
+                <div className="absolute inset-0 rounded-full border-[16px] border-muted-foreground/20" />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Category data will appear after adding expenses.
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>

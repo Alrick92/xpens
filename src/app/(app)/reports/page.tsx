@@ -30,8 +30,8 @@ export default async function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Reports</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-semibold">Reports</h1>
+        <p className="text-xs text-muted-foreground">
           Generate and export expense reports
         </p>
       </div>
@@ -40,13 +40,13 @@ export default async function ReportsPage() {
         {statusSummary.map((s) => (
           <Card key={s.status} className="border border-border">
             <CardContent className="pt-6">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-[0.05em] font-medium">
                 {s.status}
               </p>
-              <p className="text-2xl font-bold mt-1">
+              <p className="text-2xl font-semibold mt-1 font-tabular">
                 {formatCurrency(s.total, "USD")}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground">
                 {s.count} expense{s.count !== 1 ? "s" : ""}
               </p>
             </CardContent>

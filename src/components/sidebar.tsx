@@ -52,7 +52,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
         <p className="text-xs text-muted-foreground mt-0.5 capitalize">{userRole.toLowerCase()} Account</p>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-0.5 px-3 py-4">
         {visibleItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -62,21 +62,21 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-150 focus-ring",
                 isActive
-                  ? "bg-sidebar-primary text-sidebar-primary-foreground font-bold"
-                  : "text-muted-foreground hover:bg-sidebar-accent transition-colors"
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                  : "text-muted-foreground hover:bg-sidebar-accent"
               )}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className={cn("h-4 w-4", isActive && "opacity-100")} />
               {item.label}
             </Link>
           );
         })}
       </nav>
 
-      <div className="border-t border-sidebar-border p-4 space-y-1">
-        <Link href="/expenses/new" onClick={() => setMobileOpen(false)} className="block mb-4">
+      <div className="border-t border-sidebar-border p-3 space-y-0.5">
+        <Link href="/expenses/new" onClick={() => setMobileOpen(false)} className="block mb-3">
           <Button className="w-full gap-2 text-sm">
             <Plus className="h-4 w-4" />
             Add Expense
@@ -85,18 +85,18 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
         <Link
           href="/settings"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-sidebar-accent transition-colors"
+          className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-sidebar-accent transition-colors duration-150 focus-ring"
         >
           <Settings className="h-4 w-4" />
           Settings
         </Link>
-        <div className="flex items-center gap-3 px-3 py-3 mt-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted text-sm font-medium">
+        <div className="flex items-center gap-3 px-3 py-2.5 mt-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted text-xs font-medium">
             {userName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 truncate">
             <p className="text-sm font-medium truncate">{userName}</p>
-            <p className="text-xs text-muted-foreground capitalize">
+            <p className="text-[11px] text-muted-foreground capitalize">
               {userRole.toLowerCase()}
             </p>
           </div>

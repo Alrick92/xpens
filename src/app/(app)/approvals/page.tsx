@@ -33,8 +33,8 @@ export default async function ApprovalsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Approvals</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-semibold">Approvals</h1>
+        <p className="text-xs text-muted-foreground">
           Review and approve expense submissions
         </p>
       </div>
@@ -48,11 +48,11 @@ export default async function ApprovalsPage() {
         <CardContent>
           {pendingExpenses.length === 0 ? (
             <div className="flex flex-col items-center py-12">
-              <div className="rounded-xl bg-secondary p-3 mb-4">
-                <CheckCircle className="h-6 w-6 text-secondary-foreground" />
+              <div className="rounded-xl bg-muted p-3 mb-3">
+                <CheckCircle className="h-6 w-6 text-muted-foreground" />
               </div>
-              <p className="font-medium text-muted-foreground">All caught up!</p>
-              <p className="text-sm text-muted-foreground mt-1">No expenses pending approval</p>
+              <p className="text-sm font-semibold">All caught up!</p>
+              <p className="text-xs text-muted-foreground mt-1">No expenses pending approval.</p>
             </div>
           ) : (
             <div className="space-y-4">
