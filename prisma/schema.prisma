@@ -50,6 +50,7 @@ model User {
   name           String
   passwordHash   String    @map("password_hash")
   role           Role      @default(EMPLOYEE)
+  isActive       Boolean   @default(true) @map("is_active")
   avatarUrl      String?   @map("avatar_url")
   defaultCurrency Currency @default(USD) @map("default_currency")
   createdAt      DateTime  @default(now()) @map("created_at")
@@ -138,4 +139,12 @@ model LineItem {
   expense     Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 
   @@map("line_items")
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
 }

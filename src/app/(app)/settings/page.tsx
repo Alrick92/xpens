@@ -4,19 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfileForm } from "./profile-form";
 import { CategoryManager } from "./category-manager";
 import { TeamMembers } from "./team-members";
+import { ParseFlowConfig } from "./parseflow-config";
+import { getParseFlowConfig } from "@/lib/parseflow";
 
 export default async function SettingsPage() {
   const session = await requireSession();
 
-  const [user, categories, users] = await Promise.all([
+  const [user, categories, users, parseFlowConfig] = await Promise.all([
     prisma.user.findUnique({ where: { id: session.id } }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
     session.role === "ADMIN"
       ? prisma.user.findMany({
-          select: { id: true, name: true, email: true, role: true, createdAt: true },
+          select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true },
           orderBy: { createdAt: "asc" },
         })
       : Promise.resolve([]),
+    session.role === "ADMIN" ? getParseFlowConfig() : Promise.resolve(null),
   ]);
 
   if (!user) return null;
@@ -66,13 +69,30 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent>
             <TeamMembers
+              currentUserId={session.id}
               users={users.map((u) => ({
                 id: u.id,
                 name: u.name,
                 email: u.email,
                 role: u.role,
+                isActive: u.isActive,
                 createdAt: u.createdAt.toISOString(),
               }))}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {session.role === "ADMIN" && parseFlowConfig && (
+        <Card>
+          <CardHeader>
+            <CardTitle>ParseFlow OCR</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ParseFlowConfig
+              apiKey={parseFlowConfig.apiKey}
+              apiUrl={parseFlowConfig.apiUrl}
+              source={parseFlowConfig.source}
             />
           </CardContent>
         </Card>
